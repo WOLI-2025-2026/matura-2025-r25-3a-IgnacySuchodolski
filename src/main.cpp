@@ -1,6 +1,11 @@
 // ignacy suchodolski
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <string>
+#include <list>
+#include <set>
+#include <map>
 
 using namespace std;
 
@@ -43,55 +48,124 @@ void zadanie2_1()
     wyniki.close();
 }
 
-
-int main(){
-
-    ifstream plik("../zalaczniki-2025/symbole.txt");
+void zadanie2_3()
+{
+    ifstream plik(z3_1_path_symbole_txt);
     if(!plik.is_open())
     {
         cerr << "nie mozna otworzyc pliku" << endl;
-        return 1;
+        return;
     }
 
-    vector<string> linie;
+    ofstream wyniki("wynik2_3.txt");
+
+    int max_dlugosc = 0;
+    string max_ciag = "";
     string linia;
-    
-    // Wczytaj cały plik
-    while(getline(plik, linia))
+
+    while(plik >> linia)
     {
-        if(!linia.empty())
+        int i = 0;
+        while(i < linia.length())
         {
-            linie.push_back(linia);
-        }
-    }
-    plik.close();
-
-    int liczba_kwadratow = 0;
-    vector<pair<int, int>> kwadraty; 
-
-
-    for(int i = 1; i < (int)linie.size() - 1; i++)
-    {
-        for(int j = 1; j < (int)linie[i].length() - 1; j++)
-        {
-            char srodek = linie[i][j];
-            
-            if(linie[i-1][j-1] == srodek && linie[i-1][j] == srodek && linie[i-1][j+1] == srodek &&
-               linie[i][j-1] == srodek && linie[i][j] == srodek && linie[i][j+1] == srodek &&
-               linie[i+1][j-1] == srodek && linie[i+1][j] == srodek && linie[i+1][j+1] == srodek)
+            int j = i;
+            while(j < linia.length() && linia[j] == linia[i])
             {
-                liczba_kwadratow++;
-                kwadraty.push_back({i + 1, j + 1});
+                j++;
             }
+            int dlugosc = j - i;
+            if(dlugosc > max_dlugosc)
+            {
+                max_dlugosc = dlugosc;
+                max_ciag = linia.substr(i, dlugosc);
+            }
+            i = j;
         }
     }
 
-    cout << liczba_kwadratow << endl;
-    for(auto& kwadrat : kwadraty)
+    cout << max_dlugosc << " " << max_ciag << endl;
+    wyniki << max_dlugosc << " " << max_ciag << endl;
+
+    plik.close();
+    wyniki.close();
+}
+
+void zadanie2_4()
+{
+    ifstream plik(z3_1_path_symbole_txt);
+    if(!plik.is_open())
     {
-        cout << kwadrat.first << " " << kwadrat.second << endl;
+        cerr << "nie mozna otworzyc pliku" << endl;
+        return;
     }
 
+    ofstream wyniki("wynik2_4.txt");
+
+    long long max_wartosc = 0;
+    string max_ciag = "";
+    string linia;
+
+    while(plik >> linia)
+    {
+        int i = 0;
+        while(i < linia.length())
+        {
+            set<char> znaki_uzyte;
+            int j = i;
+            while(j < linia.length() && znaki_uzyte.find(linia[j]) == znaki_uzyte.end())
+            {
+                znaki_uzyte.insert(linia[j]);
+                j++;
+            }
+            string aktualny_ciag = linia.substr(i, j - i);
+            
+            long long wartosc = 0;
+            map<char, int> znak_do_cyfry;
+            int siguiente_cyfra = 0;
+            
+            for(char c : aktualny_ciag)
+            {
+                if(znak_do_cyfry.find(c) == znak_do_cyfry.end())
+                {
+                    znak_do_cyfry[c] = siguiente_cyfra;
+                    siguiente_cyfra++;
+                }
+                wartosc = wartosc * 10 + znak_do_cyfry[c];
+            }
+            
+            if(wartosc > max_wartosc)
+            {
+                max_wartosc = wartosc;
+                max_ciag = aktualny_ciag;
+            }
+            
+            i++;
+        }
+    }
+
+    cout << max_wartosc << " " << max_ciag << endl;
+    wyniki << max_wartosc << " " << max_ciag << endl;
+
+    plik.close();
+    wyniki.close();
+}
+
+void zadanie2_2()
+{
+    ifstream plik(z3_1_path_symbole_txt);
+    if(!plik.is_open())
+    {
+        cerr << "nie mozna otworzyc pliku" << endl;
+        return;
+    }
+
+
+int main()
+
+{
     zadanie2_1();
+    zadanie2_3();
+    zadanie2_4();
+    zadanie2_2();
     return 0;
 }
